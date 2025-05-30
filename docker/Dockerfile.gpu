@@ -1,0 +1,40 @@
+# Use a CUDA-enabled base image for GPU build (e.g., CUDA 11.8 runtime on Ubuntu 22.04)
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+
+# Install necessary packages: Python 3.11, pip, curl, unzip
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libblas-dev \
+    liblapack-dev \
+    python3.11 python3-pip curl unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set python3 and pip3 as the default commands
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy the GPU requirements file
+COPY gpu-requirements.txt ./gpu-requirements.txt
+
+# Copy the HebPipe source code
+COPY . .
+
+# Install Python dependencies for GPU
+# Need to use the extra index URL from the requirements file
+RUN pip install -U pip setuptools wheel && pip install --no-cache-dir -r gpu-requirements.txt
+
+# Run setup.py install - this registers the package
+RUN python setup.py install
+
+# Create models directory structure
+RUN mkdir -p /app/models/stanza
+
+# Define the entrypoint for the container
+ENTRYPOINT ["python", "-m", "hebpipe"]
+
+# You can define a default command to run if no command is provided
+# CMD ["-h"] 

@@ -28,3 +28,4 @@
 __pycache__
 /hebpipe/data/sentsplit_postag_dev_gold.tab
 /hebpipe/data/sentsplit_postag_train_gold.tab
+.venv

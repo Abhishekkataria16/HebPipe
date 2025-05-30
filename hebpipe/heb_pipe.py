@@ -58,7 +58,7 @@ bin_dir = script_dir + os.sep + "bin" + os.sep
 data_dir = script_dir + os.sep + "data" + os.sep
 model_dir = script_dir + os.sep + "models" + os.sep
 
-KNOWN_PUNCT = {'’','“','”'}  # Hardwired tokens to tag as punctutation (unicode glyphs not in training data)
+KNOWN_PUNCT = {'’','"','"'}  # Hardwired tokens to tag as punctutation (unicode glyphs not in training data)
 morph_deped = DepEdit(config_file=lib_dir+"partial_morph.ini")
 tags = {"NOUN", "VERB", "ADJ", "ADV", "PROPN"}
 lex_data = open(data_dir + "heb.lemma", encoding="utf8").readlines()
@@ -442,12 +442,18 @@ def check_requirements():
 def download_requirements(models_ok=True):
     urls = []
     if not models_ok:
-        models_base = "http://gucorpling.org/amir/download/heb_models_v4/"
-        urls.append(models_base + "heb.sm" + str(sys.version_info[0]))
-        urls.append(models_base + "heb.diaparser")
-        urls.append(models_base + "heb.xrm")
-        urls.append(models_base + "he_htb.pretrain.pt")
-        urls.append(models_base + "he_lemmatizer.pt")
+        # Define specific base URLs for different model types
+        sm_models_base = "https://gucorpling.org/amir/download/"
+        other_models_base = "https://gucorpling.org/amir/download/heb_models_v4/"
+
+        # Add heb.sm model URL
+        urls.append(sm_models_base + "heb.sm" + str(sys.version_info[0]))
+
+        # Add other model URLs from the v4 directory
+        urls.append(other_models_base + "heb.diaparser")
+        urls.append(other_models_base + "heb.xrm")
+        urls.append(other_models_base + "he_htb.pretrain.pt")
+        urls.append(other_models_base + "he_lemmatizer.pt")
     for u in urls:
         sys.stderr.write("o Downloading from " + str(u) + "\n")
         base_name = u[u.rfind("/") + 1:]

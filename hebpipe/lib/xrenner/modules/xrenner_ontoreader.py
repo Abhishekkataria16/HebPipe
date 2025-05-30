@@ -48,7 +48,7 @@ def addNewlineAfter(text):
 def mainPreprocess(filen):
 	"""preprocess OntoNotes gold files by cleaning up the empty categories and more"""
 	# filen=sys.argv[1]
-	print "Processing " + filen
+	print("Processing " + filen)
 	noemp = removeEmptyCat(filen)
 	noempi = noemp[:-2]
 	a = xml.dom.minidom.parseString(noempi)
