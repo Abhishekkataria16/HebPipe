@@ -18,7 +18,7 @@ RUN ln -sf /usr/bin/python3.11 /usr/bin/python && \
 WORKDIR /app
 
 # Copy the GPU requirements file
-COPY gpu-requirements.txt ./gpu-requirements.txt
+COPY docker/gpu-requirements.txt ./gpu-requirements.txt
 
 # Copy the HebPipe source code
 COPY . .
@@ -33,8 +33,18 @@ RUN python setup.py install
 # Create models directory structure
 RUN mkdir -p /app/models/stanza
 
-# Define the entrypoint for the container
-ENTRYPOINT ["python", "-m", "hebpipe"]
+# Create a wrapper script to handle the entrypoint
+RUN echo '#!/bin/bash\n\
+if [ "$#" -eq 0 ]; then\n\
+    echo "No arguments provided. Running in interactive mode..."\n\
+    echo "Use: docker exec -it <container_name> python -m hebpipe [arguments]"\n\
+    tail -f /dev/null\n\
+else\n\
+    python -m hebpipe "$@"\n\
+fi' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
-# You can define a default command to run if no command is provided
-# CMD ["-h"] 
+# Define the entrypoint for the container
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command (will be used if no arguments are provided)
+CMD [] 
