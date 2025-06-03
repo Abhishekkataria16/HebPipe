@@ -21,11 +21,8 @@ except:
 
 if not platform.system().lower().startswith("win"):
     # Prevent problems with pathlib in posix when restoring models trained on Windows
-    from pathlib import Path
     import pathlib
-    temp = pathlib.PosixPath
     pathlib.WindowsPath = pathlib.PosixPath
-
 
 from rftokenizer import RFTokenizer
 try:  # Module usage
@@ -85,21 +82,12 @@ for l in binyan_data:
 
 
 def init_lemmatizer(cpu=False, no_post_process=False):
-    try:
-        lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",
+    lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",
                         tokenize_pretokenized=True,
                         use_gpu=not cpu,
                         download_method=2,
                         #lemma_model_path=model_dir + "stanza" + os.sep + "he_lemmatizer.pt"
                         )
-    except:
-        stanza.download('he')
-        lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",
-                                 tokenize_pretokenized=True,
-                                 use_gpu=not cpu,
-                                 download_method=2,
-                                 # lemma_model_path=model_dir + "stanza" + os.sep + "he_lemmatizer.pt"
-                                 )
     lemmatizer.do_post_process = False if no_post_process else True
     return lemmatizer
 
@@ -478,11 +466,7 @@ def stanza_tag(token_list, sent_tag=None, lemmatizer=None):
     sent_lists = toks_to_sents(token_list)
     tokenized = "<s>\n"+ "\n</s>\n<s>\n".join(["\n".join(s).strip() for s in sent_lists]) + "\n</s>"
     if lemmatizer is None:
-        try:
-            lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",tokenize_pretokenized=True,use_gpu=torch.cuda.is_available())
-        except:
-            stanza.download('he')
-            lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",tokenize_pretokenized=True,use_gpu=torch.cuda.is_available())
+        lemmatizer = stanza.Pipeline("he", package="combined", processors="tokenize,pos,lemma",tokenize_pretokenized=True,use_gpu=torch.cuda.is_available())
 
     doc = lemmatizer(sent_lists)
     output = []
