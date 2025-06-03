@@ -19,6 +19,10 @@ except:
     from collections.abc import Mapping
     collections.Mapping = Mapping
 
+if not platform.system().lower().startswith("win"):
+    # Prevent problems with pathlib in posix when restoring models trained on Windows
+    import pathlib
+    pathlib.WindowsPath = pathlib.PosixPath
 
 from rftokenizer import RFTokenizer
 try:  # Module usage
